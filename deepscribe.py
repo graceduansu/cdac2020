@@ -16,7 +16,7 @@ class DeepScribe:
         parser = argparse.ArgumentParser()
         parser.add_argument('-s', '--symbol', help='symbol query')
 
-        #no limit indicated as 'max'
+        #no limit should be input as 'max'
         parser.add_argument('-l', '--limit', help='limit on number of image results', default=100)
         args = parser.parse_args()
         return args
@@ -32,8 +32,10 @@ class DeepScribe:
             extension_idx = fn.rfind(".jpg")
             name = args.symbol
             uuid = fn[separator_idx:extension_idx]
-            symb_img = Symbol_Image(name, uuid, cv2.imread(fn))
-            #print(symb_img)
+            
+            #not using cv2.imread() in order to read unicode filenames
+            img = cv2.imdecode(np.fromfile(fn, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+            symb_img = Symbol_Image(name, uuid, img)
             
             if args.symbol in symbol_dict:
                 symbol_dict[args.symbol].append(symb_img)
@@ -47,8 +49,13 @@ class DeepScribe:
 
     @staticmethod
     def display_images(symbol_dict):
-        # show_images()
-        return
+        images = []
+
+        for s in symbol_dict.values():
+            for symb_img in s:
+                images.append(symb_img.img)
+                
+        show_images(images)
 
     @staticmethod
     def transform_images():

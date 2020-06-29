@@ -10,7 +10,7 @@ def run():
         for symb_img in s:
             print(symb_img)
 
-    # DeepScribe.display_images(symbol_list)
+    DeepScribe.display_images(symbol_dict)
 
 
 if __name__ == '__main__':
