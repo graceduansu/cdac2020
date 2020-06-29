@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 
-def show_images(images, titles=None):
+def show_images(images, titles=None, color=False):
 
     assert ((titles is None) or (len(images) == len(titles)))
     n_images = len(images)
@@ -20,7 +20,10 @@ def show_images(images, titles=None):
         if image.ndim == 2:
             plt.gray()
         plt.axis("off")
-        plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        if color:
+            plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        else:
+            plt.imshow(image)
         a.set_title(title, size=5)
     fig.set_size_inches(np.array(fig.get_size_inches()) * n_images)
     plt.show()

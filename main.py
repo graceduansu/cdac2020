@@ -5,12 +5,11 @@ def run():
     symbol_dict = {}
     DeepScribe.load_images(symbol_dict)
 
-    # TODO: maybe make Printing symbol_dict nicely a method
     for s in symbol_dict.values():
         for symb_img in s:
             print(symb_img)
 
-    DeepScribe.transform_images(symbol_dict, otsus=0, gauss_filter=7)
+    DeepScribe.transform_images(symbol_dict, bilat_filter=[7,75,75])
     DeepScribe.display_images(symbol_dict)
 
 
