@@ -6,7 +6,7 @@ class Symbol_Image:
         self.symb_name = symb_name
         self.uuid = uuid
         self.img = img
-    
+
     def __str__(self):
         #maybe print img size
         return "UUID: %s | symbol name: %s" % (self.uuid, self.symb_name)

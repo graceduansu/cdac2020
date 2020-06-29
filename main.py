@@ -10,7 +10,7 @@ def run():
         for symb_img in s:
             print(symb_img)
 
-    DeepScribe.transform_images(symbol_dict)
+    DeepScribe.transform_images(symbol_dict, otsus=0, gauss_filter=7)
     DeepScribe.display_images(symbol_dict)
 
 
