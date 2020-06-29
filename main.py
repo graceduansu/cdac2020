@@ -10,6 +10,7 @@ def run():
         for symb_img in s:
             print(symb_img)
 
+    DeepScribe.transform_images(symbol_dict)
     DeepScribe.display_images(symbol_dict)
 
 

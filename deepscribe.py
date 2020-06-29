@@ -11,8 +11,6 @@ from disp_multiple_images import show_images
 class DeepScribe:
     @staticmethod
     def get_command_line_args():
-        #TODO: Why is there no "Error: Too few arguments"?
-        #TODO: create default for symbol
         parser = argparse.ArgumentParser()
         parser.add_argument('-s', '--symbol', help='symbol query')
 
@@ -58,5 +56,9 @@ class DeepScribe:
         show_images(images)
 
     @staticmethod
-    def transform_images():
-        return
+    def transform_images(symbol_dict, gray=True):
+        for s in symbol_dict.values():
+            for symb_img in s:
+                if gray:
+                    gray_img = cv2.cvtColor(symb_img.img, cv2.COLOR_BGR2GRAY)
+                    symb_img.img = gray_img
