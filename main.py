@@ -9,8 +9,12 @@ def run():
         for symb_img in s:
             print(symb_img)
 
-    DeepScribe.transform_images(symbol_dict, bilat_filter=[7,75,75])
+    #print(symbol_dict['¦'][1].img)
+    DeepScribe.transform_images(symbol_dict, resize=343)
+    #DeepScribe.transform_images(symbol_dict, gray=False)
     DeepScribe.display_images(symbol_dict)
+    #print("______________________________________")
+    #print(symbol_dict['¦'][1].img)
 
 
 if __name__ == '__main__':

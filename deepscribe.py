@@ -114,23 +114,23 @@ class DeepScribe:
                     canny_img = cv2.Canny(symb_img.img, canny[0], canny[1])
                     symb_img.img = canny_img
                 if rescale_global_mean:
-                    scaled_img = symb_img.img /255.0
+                    scaled_img = symb_img.img / 255.0
                     symb_img.img = scaled_img - np.mean(scaled_img)
                 if resize != -1:
-                    # from https://jdhao.github.io/2017/11/06/resize-image-to-square-with-padding/#using-opencv
-                    #TODO: make image resize to square with padding as expected
                     old_size = symb_img.img.shape[:2]
-                    ratio = float(resize)/max(old_size)
-                    new_size = tuple([int(x*ratio) for x in old_size])
-                    new_img = cv2.resize(symb_img.img, (new_size[1], new_size[0]))
 
-                    delta_w = resize - new_size[1]
-                    delta_h = resize - new_size[0]
-                    top, bottom = delta_h//2, delta_h-(delta_h//2)
-                    left, right = delta_w//2, delta_w-(delta_w//2)
+                    delta_w = max(old_size) - old_size[1]
+                    delta_h = max(old_size) - old_size[0]
+                    top, bottom = delta_h // 2, delta_h - (delta_h // 2)
+                    left, right = delta_w // 2, delta_w - (delta_w // 2)
 
                     color = [0, 0, 0]
-                    new_img = cv2.copyMakeBorder(symb_img.img, top, bottom, left, right, cv2.BORDER_CONSTANT,
-                        value=color)
-                    symb_img.img = new_img
+                    symb_img.img = cv2.copyMakeBorder(symb_img.img,
+                                                      top,
+                                                      bottom,
+                                                      left,
+                                                      right,
+                                                      cv2.BORDER_CONSTANT,
+                                                      value=color)
 
+                    symb_img.img = cv2.resize(symb_img.img, (resize, resize))
