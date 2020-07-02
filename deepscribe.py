@@ -25,13 +25,22 @@ class DeepScribe:
     @staticmethod
     def load_images(symbol_dict):
         args = DeepScribe.get_command_line_args()
-        query = "a_pfa/" + args.symbol + "_*.jpg"
+
+        if args.symbol is None:
+            symb_query = "*"
+        else:
+            symb_query = args.symbol
+        
+        query = "a_pfa/" + symb_query + "_*.jpg"
         count = 0
 
         for fn in iglob(query):
-            separator_idx = len("a_pfa/" + args.symbol + "_")
+            #find second occurence of "_" which marks the start of the uuid
+            separator_idx = fn.find("_", 6)
+            print(separator_idx)
+
             extension_idx = fn.rfind(".jpg")
-            name = args.symbol
+            name = fn[6:separator_idx]
             uuid = fn[separator_idx:extension_idx]
 
             #not using cv2.imread() in order to read unicode filenames
@@ -39,10 +48,10 @@ class DeepScribe:
                                cv2.IMREAD_UNCHANGED)
             symb_img = Symbol_Image(name, uuid, img)
 
-            if args.symbol in symbol_dict:
-                symbol_dict[args.symbol].append(symb_img)
+            if name in symbol_dict:
+                symbol_dict[name].append(symb_img)
             else:
-                symbol_dict[args.symbol] = [symb_img]
+                symbol_dict[name] = [symb_img]
             count += 1
 
             if args.limit != 'max':

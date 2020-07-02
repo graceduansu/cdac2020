@@ -1,4 +1,5 @@
 from deepscribe import DeepScribe
+#import mnist
 
 
 def run():
