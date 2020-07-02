@@ -37,11 +37,9 @@ class DeepScribe:
         for fn in iglob(query):
             #find second occurence of "_" which marks the start of the uuid
             separator_idx = fn.find("_", 6)
-            print(separator_idx)
-
             extension_idx = fn.rfind(".jpg")
             name = fn[6:separator_idx]
-            uuid = fn[separator_idx:extension_idx]
+            uuid = fn[separator_idx+1:extension_idx]
 
             #not using cv2.imread() in order to read unicode filenames
             img = cv2.imdecode(np.fromfile(fn, dtype=np.uint8),
@@ -122,6 +120,7 @@ class DeepScribe:
                 if canny != -1:
                     canny_img = cv2.Canny(symb_img.img, canny[0], canny[1])
                     symb_img.img = canny_img
+                #TODO: is normalizing before resizing correct?
                 if rescale_global_mean:
                     scaled_img = symb_img.img / 255.0
                     symb_img.img = scaled_img - np.mean(scaled_img)
@@ -143,3 +142,40 @@ class DeepScribe:
                                                       value=color)
 
                     symb_img.img = cv2.resize(symb_img.img, (resize, resize))
+
+    @staticmethod
+    def count_symbols():
+        symbol_dict = {}
+        args = DeepScribe.get_command_line_args()
+
+        if args.symbol is None:
+            symb_query = "*"
+        else:
+            symb_query = args.symbol
+        
+        query = "a_pfa/" + symb_query + "_*.jpg"
+        count = 0
+
+        for fn in iglob(query):
+            #find second occurence of "_" which marks the start of the uuid
+            separator_idx = fn.find("_", 6)
+            name = fn[6:separator_idx]
+
+            if name in symbol_dict:
+                symbol_dict[name] += 1
+            else:
+                symbol_dict[name] = 1
+            count += 1
+
+            if args.limit != 'max':
+                if count >= args.limit:
+                    break
+        
+        print(len(symbol_dict))
+        for s in symbol_dict:
+            print(s, ": ", symbol_dict[s])
+        
+        total = 0
+        for s in symbol_dict.values():
+            total += s
+        print(total)
