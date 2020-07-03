@@ -12,35 +12,55 @@ from keras.models import Sequential
 from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 
 
-def dict_to_np_arrays(symbol_dict):
+def dict_to_np_arrays():
+    """
+    Creates dictionary of symbols based on command line arguments, resizes 
+    images, rescales image values, encodes labels, and saves image and 
+    label data as numpy arrays in .np files.
+    """
+    symbol_dict = {}
+    DeepScribe.load_images(symbol_dict)
+    print("symbol_dict len (number of symbols):", len(symbol_dict))
     DeepScribe.transform_images(symbol_dict,
                                 rescale_global_mean=True,
                                 resize=100)
 
     img_data = []
     label_data = []
-    #TODO: is list append or np append better?
+    # TODO: is list append or np append better?
     for symb_name in symbol_dict:
         for symb_img in symbol_dict[symb_name]:
             img_data.append(symb_img.img)
             label_data.append(symb_name)
 
-    #TODO: does dtype of array matter? This is default float64
-    img_data = np.array(img_data, dtype='float32')
-    
+    # TODO: does dtype of array matter? This is default float64
     label_encoder = LabelEncoder()
+    print("label_data:", label_data)
     label_data = label_encoder.fit_transform(label_data)
+    print("label_data encoded:", label_data)
     label_data = np.array(label_data, dtype='float32')
-    print(img_data.shape)
-    print(label_data.shape)
+    print("label_data array shape:", label_data.shape)
+
+    img_data = np.array(img_data, dtype='float32')
+    print("img_data array shape:", img_data.shape)
+    
+    # For color images: 
     # convert (number of images x height x width x number of channels) to (number of images x (height * width *3))
-    #img_data = np.reshape(img_data,[img_data.shape[0],img_data.shape[1]*img_data.shape[2]*img_data.shape[3]])
-    np.save('img_data', img_data)
-    np.save('label_data', label_data)
+    # img_data = np.reshape(img_data,[img_data.shape[0],img_data.shape[1]*img_data.shape[2]*img_data.shape[3]])
+    
+    np.save('output/img_data1', img_data)
+    np.save('output/label_data1', label_data)
     return img_data, label_data
 
 
 def run_mnist(X, y):
+    """
+    Runs and evaluates model with MNIST architecture on OCHRE data.
+
+    Arguments:
+    X (numpy array): All image data to be used for training and testing.
+    y (numpy array): All label data for each image.
+    """
     x_train, x_test, y_train, y_test = train_test_split(X,
                                                         y,
                                                         test_size=0.2,
@@ -61,6 +81,8 @@ def run_mnist(X, y):
     print('Number of images in x_train', x_train.shape[0])
     print('Number of images in x_test', x_test.shape[0])
 
+    # output_classes = DeepScribe.count_symbols()
+
     # Creating a Sequential Model and adding the layers
     model = Sequential()
     model.add(Conv2D(28, kernel_size=(3,3), input_shape=input_shape))
@@ -68,7 +90,7 @@ def run_mnist(X, y):
     model.add(Flatten()) # Flattening the 2D arrays for fully connected layers
     model.add(Dense(128, activation=tf.nn.relu))
     model.add(Dropout(0.2))
-    model.add(Dense(278, activation=tf.nn.softmax))
+    model.add(Dense(232, activation=tf.nn.softmax)) #output_classes
     model.summary()
 
     model.compile(optimizer='adam', 
@@ -79,10 +101,12 @@ def run_mnist(X, y):
     results = model.evaluate(x_test, y_test)
     print("test loss, test acc:", results)
 
-    model.save("MNIST_model_on_OCHRE")
+    model.save("output/MNIST_model_on_OCHRE1")
 
     image_index = 10
     plt.imshow(x_test[image_index].reshape(100,100), cmap='Greys')
+    plt.show()
+
     pred = model.predict(x_test[image_index].reshape(1, 100, 100, 1))
     print('Label: ', y_test[image_index])
     print(pred)
