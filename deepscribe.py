@@ -183,4 +183,5 @@ class DeepScribe:
                 total += s
             print(total)
 
-        return len(symbol_dict)
+        # return len(symbol_dict)
+        return symbol_dict.keys()

@@ -1,4 +1,5 @@
 from deepscribe import DeepScribe
+from disp_multiple_images import show_images
 
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -6,11 +7,12 @@ import numpy as np
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import classification_report
 
 # Importing the required Keras modules containing model and layers
+from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
-
 
 def dict_to_np_arrays():
     """
@@ -52,7 +54,7 @@ def dict_to_np_arrays():
     np.save('output/label_data1', label_data)
     return img_data, label_data
 
-
+# TODO: add training curve?
 def run_mnist(X, y):
     """
     Runs and evaluates model with MNIST architecture on OCHRE data.
@@ -96,18 +98,62 @@ def run_mnist(X, y):
     model.compile(optimizer='adam', 
                 loss='sparse_categorical_crossentropy', 
                 metrics=['accuracy'])
-    model.fit(x=x_train,y=y_train, epochs=10)
+    model.fit(x=x_train,y=y_train, epochs=100)
 
     results = model.evaluate(x_test, y_test)
     print("test loss, test acc:", results)
 
-    model.save("output/MNIST_model_on_OCHRE1")
+    model.save("output/MNIST_model_on_OCHRE_100_epochs")
 
-    image_index = 10
-    plt.imshow(x_test[image_index].reshape(100,100), cmap='Greys')
-    plt.show()
+    # show_classification_report(X,y)
 
-    pred = model.predict(x_test[image_index].reshape(1, 100, 100, 1))
-    print('Label: ', y_test[image_index])
-    print(pred)
-    print(pred.argmax())
+# TODO: Add filename params
+# TODO: Add confusion matrix
+def show_classification_report(X,y):
+    """
+    MUST RUN WITH -l max
+    """
+    x_train, x_test, y_train, y_test = train_test_split(X,
+                                                        y,
+                                                        test_size=0.2,
+                                                        random_state=42)
+
+    x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2],
+                            1)
+    x_test = x_test.astype('float32')
+    print('x_test shape:', x_test.shape)
+    # print("indices:", indices)
+    print("y_test:", y_test)
+    
+    # Get symbol names
+    symbol_names = list(DeepScribe.count_symbols())
+    print("symbol names:", symbol_names)
+
+    model = keras.models.load_model("output/MNIST_model_on_OCHRE1")
+    y_pred = model.predict_classes(x_test)
+    
+    # Get LabelEncoder, then inverse transform y values to corresponding label names
+    label_encoder = LabelEncoder()
+    label_encoder.fit(symbol_names)
+    y_test = label_encoder.inverse_transform(y_test)
+    y_pred = label_encoder.inverse_transform(y_pred)
+    print("y_test:", y_test)
+    print("y_pred:", y_pred)
+
+    # Call sklearn classification function
+    print("y_test dtype:", y_test.dtype)
+    print("y_pred dtype:", y_pred.dtype)
+    print(classification_report(y_test, y_pred))
+    
+    # Display 100 images
+    images = []
+    titles = []
+    x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2])
+    """
+    while i in range(100):
+        for layer in x_test:
+            images.append(layer)
+            title = "Pred: " + 
+            i += 1
+    """
+    show_images(images)

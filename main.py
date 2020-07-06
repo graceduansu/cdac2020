@@ -19,6 +19,7 @@ def run():
     X = np.load("output/img_data1.npy")
     y = np.load("output/label_data1.npy")
     mnist.run_mnist(X, y)
+    # mnist.show_classification_report(X, y)
 
 
 if __name__ == '__main__':
