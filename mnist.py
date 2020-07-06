@@ -58,6 +58,7 @@ def dict_to_np_arrays():
 def run_mnist(X, y):
     """
     Runs and evaluates model with MNIST architecture on OCHRE data.
+    Returns training history.
 
     Arguments:
     X (numpy array): All image data to be used for training and testing.
@@ -98,12 +99,31 @@ def run_mnist(X, y):
     model.compile(optimizer='adam', 
                 loss='sparse_categorical_crossentropy', 
                 metrics=['accuracy'])
-    model.fit(x=x_train,y=y_train, epochs=100)
+    history = model.fit(x=x_train,y=y_train, epochs=100)
 
     results = model.evaluate(x_test, y_test)
     print("test loss, test acc:", results)
 
     model.save("output/MNIST_model_on_OCHRE_100_epochs")
+
+    # summarize history for accuracy
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('model accuracy')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper left')
+    plt.show()
+    
+    # summarize history for loss
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('model loss')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'test'], loc='upper right')
+    plt.show()
+    return history
 
     # show_classification_report(X,y)
 
