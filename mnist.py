@@ -15,9 +15,11 @@ from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 
 def dict_to_np_arrays():
     """
-    Creates dictionary of symbols based on command line arguments, resizes 
-    images, rescales image values, encodes labels, and saves image and 
-    label data as numpy arrays in .np files.
+    Process and save symbol dictionary generated from command line arguments as arrays in .np files.
+    
+    Returns:
+        img_data (numpy.ndarray): 3D array of all image data from symbol dictionary.
+        label_data (numpy.ndarray): 1D array of all label data corresponding to img_data.
     """
     symbol_dict = {}
     DeepScribe.load_images(symbol_dict)
@@ -53,14 +55,17 @@ def dict_to_np_arrays():
     return img_data, label_data
 
 # TODO: add training curve?
-def run_mnist(X, y):
+def run_mnist(X, y, save_path):
     """
     Runs and evaluates model with MNIST architecture on OCHRE data.
-    Returns training history.
-
-    Arguments:
-    X (numpy array): All image data to be used for training and testing.
-    y (numpy array): All label data for each image.
+ 
+    Parameters:
+        X (numpy.ndarray): 3D array of all image data to be used for training and testing.
+        y (numpy.ndarray): 1D array of all label data corresponding to img_data.
+        save_path (str): File path to save Keras model to after training.
+        
+    Returns:
+        history: Keras history object that holds records of metric values during training.
     """
     x_train, x_test, y_train, y_test = train_test_split(X,
                                                         y,
@@ -100,7 +105,7 @@ def run_mnist(X, y):
     results = model.evaluate(x_test, y_test)
     print("test loss, test acc:", results)
 
-    model.save("output/MNIST_model_on_OCHRE_100_epochs")
+    model.save(save_path)
 
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
@@ -119,15 +124,21 @@ def run_mnist(X, y):
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper right')
     plt.show()
+    
+    #show_classification_report(X,y)
     return history
 
-    # show_classification_report(X,y)
-
-# TODO: Add filename params
 # TODO: Add confusion matrix
-def show_classification_report(X,y):
+def show_classification_report(X, y, save_path):
     """
-    MUST RUN WITH -l max
+    RUN WITH -l max
+    
+    Displays classification report for a saved Keras model.
+    
+    Parameters:
+        X (numpy.ndarray): 3D array of all image data used for training and testing.
+        y (numpy.ndarray): 1D array of all label data corresponding to img_data.
+        save_path (str): File path of Keras model to be evaluated.
     """
     x_train, x_test, y_train, y_test = train_test_split(X,
                                                         y,
@@ -144,20 +155,21 @@ def show_classification_report(X,y):
     symbol_names = list(DeepScribe.count_symbols())
     print("symbol names:", symbol_names)
 
-    model = keras.models.load_model("output/MNIST_model_on_OCHRE1")
+    model = keras.models.load_model(save_path)
     y_pred = model.predict_classes(x_test)
     
-    # Get LabelEncoder, then inverse transform y values to corresponding label names
-    label_encoder = LabelEncoder()
-    label_encoder.fit(symbol_names)
-    y_test = label_encoder.inverse_transform(y_test)
-    y_pred = label_encoder.inverse_transform(y_pred)
+    # Transform y values to corresponding label names
+    for i in range(len(y_test)):
+      y_test[i] = symbol_names[int(y_test[i])]
+
+    for i in range(len(y_pred)):
+      y_pred[i] = symbol_names[int(y_pred[i])]
+    
     print("y_test:", y_test)
     print("y_pred:", y_pred)
-
-    # Call sklearn classification function
     print("y_test dtype:", y_test.dtype)
     print("y_pred dtype:", y_pred.dtype)
+    
     print(classification_report(y_test, y_pred))
     
     # Display 100 images
