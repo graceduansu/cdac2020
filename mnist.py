@@ -9,7 +9,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report
 
-# Importing the required Keras modules containing model and layers
 from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
@@ -29,13 +28,12 @@ def dict_to_np_arrays():
 
     img_data = []
     label_data = []
-    # TODO: is list append or np append better?
+
     for symb_name in symbol_dict:
         for symb_img in symbol_dict[symb_name]:
             img_data.append(symb_img.img)
             label_data.append(symb_name)
 
-    # TODO: does dtype of array matter? This is default float64
     label_encoder = LabelEncoder()
     print("label_data:", label_data)
     label_data = label_encoder.fit_transform(label_data)
@@ -83,8 +81,6 @@ def run_mnist(X, y):
     print('y_train shape:', y_train.shape)
     print('Number of images in x_train', x_train.shape[0])
     print('Number of images in x_test', x_test.shape[0])
-
-    # output_classes = DeepScribe.count_symbols()
 
     # Creating a Sequential Model and adding the layers
     model = Sequential()
@@ -142,7 +138,6 @@ def show_classification_report(X,y):
                             1)
     x_test = x_test.astype('float32')
     print('x_test shape:', x_test.shape)
-    # print("indices:", indices)
     print("y_test:", y_test)
     
     # Get symbol names
@@ -169,11 +164,12 @@ def show_classification_report(X,y):
     images = []
     titles = []
     x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2])
-    """
+
     while i in range(100):
         for layer in x_test:
             images.append(layer)
-            title = "Pred: " + 
+            title = "P: " + y_pred[i] + ", T: " + y_test[i]
+            titles.append(title)
             i += 1
-    """
+
     show_images(images)
