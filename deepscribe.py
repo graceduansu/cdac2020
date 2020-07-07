@@ -9,8 +9,19 @@ from disp_multiple_images import show_images
 
 
 class DeepScribe:
+    """
+    Loads, transforms, and displays OCHRE dataset images.
+    """
+    
     @staticmethod
     def get_command_line_args():
+        """
+        Receives command line arguments specifying what images to use.
+        
+        Returns:
+            args (argparse object): Object storing each argument with its corresponding command line input.
+        """
+        
         parser = argparse.ArgumentParser()
         parser.add_argument('-s', '--symbol', help='symbol query')
 
@@ -22,8 +33,16 @@ class DeepScribe:
         args = parser.parse_args()
         return args
 
+    # Maybe change symbol_dict to return value instead of parameter
     @staticmethod
     def load_images(symbol_dict):
+        """
+        Loads images based on command line arguments and stores them as Symbol_Image objects in a dictionary.
+        
+        Parameters:
+            symbol_dict (dict): Dictionary to store loaded image data as symbol name : Symbol_Image object pairs.
+        """
+        
         args = DeepScribe.get_command_line_args()
 
         if args.symbol is None:
@@ -59,6 +78,14 @@ class DeepScribe:
 
     @staticmethod
     def display_images(symbol_dict, color=False):
+        """
+        Takes dictionary of loaded image data and displays all images in one matplotlib plot.
+        
+        Paramters:
+            symbol_dict (dict): Dictionary of loaded image data.
+            color (boolean): Displays images in color if True, otherwise displays in grayscale.
+        """
+        
         images = []
 
         for s in symbol_dict.values():
@@ -81,6 +108,24 @@ class DeepScribe:
                          canny=-1,
                          rescale_global_mean=False,
                          resize=-1):
+        """
+        Takes dictionary of loaded image data, transforms all images according to the parameters, and saves them back in the dictionary.
+        
+        Paramters:
+            symbol_dict (dict): Dictionary of loaded image data.
+            gray (boolean): Converts images to grayscale if True, otherwise leaves them in color.
+            gauss_filter (int): Kernel size of gaussian filter. If -1, do not apply filter.
+            bilat_filter (list): List of length 3 of cv2.bilateralFilter parameters. If -1, do not apply filter.
+            global_thresh (int): Global threshold value. If -1, do not apply threshold.
+            adapt_thresh_mean (int): Block size of adaptive mean threshold. If -1, do not apply threshold.
+            adapt_thresh_gauss (int): Block size of adaptive gaussian threshold. If -1, do not apply threshold.
+            otsus (int): Otsu's binarization threshold value. If -1, do not apply threshold.
+            laplacian (boolean): Applies Laplacian operator if True, otherwise does not apply operator.
+            canny (list): List of length 2 of cv2.Canny parameters. If -1, do not apply canny edge detection.
+            rescale_global_mean (boolean): Normalizes all image pixels and subtracts out the global mean pixel value if True.
+            resize (int): Target width and height of image to be resized to. If -1, do not resize image.
+        """
+        
         for s in symbol_dict.values():
             for symb_img in s:
                 if gray:
@@ -146,6 +191,16 @@ class DeepScribe:
 
     @staticmethod
     def count_symbols(printing=False):
+        """
+        Count the number of different symbols represented by the images loaded by the command line arguments.
+        
+        Parameters:
+            printing (boolean): Print out the symbol dictionary of symbol name : frequency pairs for the loaded images.
+            
+        Returns:
+            A list of different symbol names that were represented by the images loaded by the command line arguments.
+        """
+        
         symbol_dict = {}
         args = DeepScribe.get_command_line_args()
 
@@ -184,4 +239,4 @@ class DeepScribe:
             print(total)
 
         # return len(symbol_dict)
-        return symbol_dict.keys()
+        return list(symbol_dict.keys())
