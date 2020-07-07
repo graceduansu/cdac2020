@@ -21,6 +21,7 @@ def dict_to_np_arrays():
         img_data (numpy.ndarray): 3D array of all image data from symbol dictionary.
         label_data (numpy.ndarray): 1D array of all label data corresponding to img_data.
     """
+    
     symbol_dict = {}
     DeepScribe.load_images(symbol_dict)
     print("symbol_dict len (number of symbols):", len(symbol_dict))
@@ -67,6 +68,7 @@ def run_mnist(X, y, save_path):
     Returns:
         history: Keras history object that holds records of metric values during training.
     """
+    
     x_train, x_test, y_train, y_test = train_test_split(X,
                                                         y,
                                                         test_size=0.2,
@@ -107,6 +109,7 @@ def run_mnist(X, y, save_path):
 
     model.save(save_path)
 
+    print(history)
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
     plt.plot(history.history['val_accuracy'])
@@ -140,6 +143,7 @@ def show_classification_report(X, y, save_path):
         y (numpy.ndarray): 1D array of all label data corresponding to img_data.
         save_path (str): File path of Keras model to be evaluated.
     """
+    
     x_train, x_test, y_train, y_test = train_test_split(X,
                                                         y,
                                                         test_size=0.2,
