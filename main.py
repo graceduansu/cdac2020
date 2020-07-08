@@ -18,8 +18,10 @@ def run():
 
     X = np.load("output/img_data1.npy")
     y = np.load("output/label_data1.npy")
-    mnist.run_mnist(X, y, "output/MNIST_model_on_OCHRE_100_epochs")
-    # mnist.show_classification_report(X, y, "output/MNIST_model_on_OCHRE1_100_epochs")
+    # mnist.run_mnist(X, y, "output/MNIST_model_on_OCHRE_100_epochs")
+    mnist.show_classification_report(X, y, "output/MNIST_model_on_OCHRE_100_epochs")
+
+    #mnist.get_training_curve("training_output_100_epochs.txt")
 
 
 if __name__ == '__main__':

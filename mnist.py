@@ -4,6 +4,7 @@ from disp_multiple_images import show_images
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
+import h5py
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -15,7 +16,7 @@ from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 
 def dict_to_np_arrays():
     """
-    Process and save symbol dictionary generated from command line arguments as arrays in .np files.
+    Process and save symbol dictionary generated from command line arguments as arrays in .npy files.
     
     Returns:
         img_data (numpy.ndarray): 3D array of all image data from symbol dictionary.
@@ -112,26 +113,21 @@ def run_mnist(X, y, save_path):
     print(history)
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
-    plt.plot(history.history['val_accuracy'])
     plt.title('model accuracy')
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
     plt.show()
     
     # summarize history for loss
     plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
     plt.title('model loss')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper right')
     plt.show()
     
     #show_classification_report(X,y)
     return history
 
-# TODO: Add confusion matrix
 def show_classification_report(X, y, save_path):
     """
     RUN WITH -l max
@@ -158,34 +154,89 @@ def show_classification_report(X, y, save_path):
     # Get symbol names
     symbol_names = list(DeepScribe.count_symbols())
     print("symbol names:", symbol_names)
-
-    model = keras.models.load_model(save_path)
-    y_pred = model.predict_classes(x_test)
-    
-    # Transform y values to corresponding label names
-    for i in range(len(y_test)):
-      y_test[i] = symbol_names[int(y_test[i])]
-
-    for i in range(len(y_pred)):
-      y_pred[i] = symbol_names[int(y_pred[i])]
     
     print("y_test:", y_test)
-    print("y_pred:", y_pred)
-    print("y_test dtype:", y_test.dtype)
-    print("y_pred dtype:", y_pred.dtype)
+
+    y_test_list = []
+    # Transform y values to corresponding label names
+    for i in range(len(y_test)):
+        s_idx = int(y_test[i])
+        y_test_list.append(symbol_names[s_idx])
     
-    print(classification_report(y_test, y_pred))
+    print("y_test_list:", y_test_list)
+
+    
+    try:
+        model = keras.models.load_model(save_path) 
+    except TypeError:
+        print("Changing model binary file \"learning_rate\" to \"lr\"")
+        f = h5py.File(save_path, "r+")
+        data_p = f.attrs['training_config']
+        data_p = data_p.decode().replace("learning_rate","lr").encode()
+        f.attrs['training_config'] = data_p
+        f.close()
+        print("File modification finished.")       
+    
+    y_pred = model.predict_classes(x_test)
+    print("y_pred:", y_pred)
+    y_pred_list = []
+    for i in range(len(y_pred)):
+        s_idx = int(y_pred[i])
+        y_pred_list.append(symbol_names[s_idx])
+    
+    print("y_pred_list:", y_pred_list)
+    
+    print(classification_report(y_test_list, y_pred_list))
     
     # Display 100 images
     images = []
     titles = []
     x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2])
 
+    # TODO: this does not run
+    i = 0
     while i in range(100):
         for layer in x_test:
             images.append(layer)
-            title = "P: " + y_pred[i] + ", T: " + y_test[i]
+            title = "P: " + y_pred_list[i] + ", T: " + y_test_list[i]
             titles.append(title)
             i += 1
 
     show_images(images)
+
+def get_training_curve(output_file):
+    """
+    Display training loss and accuracy curves based on model training output text file.
+
+    Parameters:
+        output_file (str): File path of model training output text file.
+    """
+
+    f = open(output_file, "r")
+    loss = []
+    accuracy = []
+
+    for line in f:
+        l = line.find("loss: ")
+        a = line.find("accuracy: ")
+        if l != -1:
+            loss.append(float(line[l+6:a].strip(' -')))
+        if a != -1:
+            accuracy.append(float(line[a+10:].strip()))
+    
+    print(loss)
+    print(accuracy)
+    x = list(range(1, 101))
+
+    plt.plot(x, loss)
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("MNIST Model Training Loss on OCHRE")
+    plt.show()
+
+    plt.plot(x, accuracy)
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
+    plt.title("MNIST Model Training Accuracy on OCHRE")
+    plt.show()
+    
