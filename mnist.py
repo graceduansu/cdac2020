@@ -14,9 +14,13 @@ from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 
-def dict_to_np_arrays():
+def dict_to_np_arrays(img_data_save_path, label_data_save_path):
     """
     Process and save symbol dictionary generated from command line arguments as arrays in .npy files.
+
+    Parameters:
+        img_data_save_path (str): File path to save 3D numpy array of all image data to.
+        label_data_save_path (str): File path to save 1D numpy array of all label data to.
     
     Returns:
         img_data (numpy.ndarray): 3D array of all image data from symbol dictionary.
@@ -48,15 +52,10 @@ def dict_to_np_arrays():
     img_data = np.array(img_data, dtype='float32')
     print("img_data array shape:", img_data.shape)
     
-    # For color images: 
-    # convert (number of images x height x width x number of channels) to (number of images x (height * width *3))
-    # img_data = np.reshape(img_data,[img_data.shape[0],img_data.shape[1]*img_data.shape[2]*img_data.shape[3]])
-    
-    np.save('output/img_data1', img_data)
-    np.save('output/label_data1', label_data)
+    np.save(img_data_save_path, img_data)
+    np.save(label_data_save_path, label_data)
     return img_data, label_data
 
-# TODO: add training curve?
 def run_mnist(X, y, save_path):
     """
     Runs and evaluates model with MNIST architecture on OCHRE data.

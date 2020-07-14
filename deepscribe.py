@@ -37,10 +37,11 @@ class DeepScribe:
     @staticmethod
     def load_images(symbol_dict):
         """
-        Loads images based on command line arguments and stores them as Symbol_Image objects in a dictionary.
+        Loads images in BGR based on command line arguments and stores them as Symbol_Image objects in a dictionary.
         
         Parameters:
             symbol_dict (dict): Dictionary to store loaded image data as symbol name : Symbol_Image object pairs.
+
         """
         
         args = DeepScribe.get_command_line_args()
