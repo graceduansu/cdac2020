@@ -228,6 +228,7 @@ Epoch 100/100
 88184/88184 [==============================] - 527s 6ms/step - loss: 0.2920 - accuracy: 0.9242
 22046/22046 [==============================] - 33s 2ms/step
 test loss, test acc: [9.432403755222595, 0.16805769503116608]
+Top 5 accuracy: 0.4211194774562279
 
 Classification report:
                  precision    recall  f1-score   support

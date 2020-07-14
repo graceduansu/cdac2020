@@ -150,6 +150,7 @@ def show_classification_report(X, y, save_path):
     print('x_test shape:', x_test.shape)
     print("y_test:", y_test)
     
+    """
     # Get symbol names
     symbol_names = list(DeepScribe.count_symbols())
     print("symbol names:", symbol_names)
@@ -163,7 +164,7 @@ def show_classification_report(X, y, save_path):
         y_test_list.append(symbol_names[s_idx])
     
     print("y_test_list:", y_test_list)
-
+    """
     
     try:
         model = keras.models.load_model(save_path) 
@@ -176,6 +177,24 @@ def show_classification_report(X, y, save_path):
         f.close()
         print("File modification finished.")       
     
+    # Print top 5 accuracy
+    print("Top 5 accuracy:")
+    n = 5
+    probas = model.predict(x_test)
+    print("probas shape:", probas.shape)
+
+    successes = 0
+    total = 0
+
+    for i in range(len(y_test)):
+        top_n_predictions = np.argpartition(probas[i], -n)[-n:]
+
+        if y_test[i] in top_n_predictions:
+            successes += 1
+        total +=1
+    print(successes/total)
+
+    """
     y_pred = model.predict_classes(x_test)
     print("y_pred:", y_pred)
     y_pred_list = []
@@ -188,11 +207,11 @@ def show_classification_report(X, y, save_path):
     print(classification_report(y_test_list, y_pred_list))
     
     # Display 100 images
+    # TODO: this does not run
     images = []
     titles = []
     x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2])
 
-    # TODO: this does not run
     i = 0
     while i in range(100):
         for layer in x_test:
@@ -202,6 +221,7 @@ def show_classification_report(X, y, save_path):
             i += 1
 
     show_images(images)
+    """
 
 def get_training_curve(output_file):
     """
