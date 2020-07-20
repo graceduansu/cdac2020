@@ -14,6 +14,7 @@ from tensorflow import keras
 from keras.models import Sequential
 from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPooling2D
 
+
 def dict_to_np_arrays(img_data_save_path, label_data_save_path):
     """
     Process and save symbol dictionary generated from command line arguments as arrays in .npy files.
@@ -55,6 +56,7 @@ def dict_to_np_arrays(img_data_save_path, label_data_save_path):
     np.save(img_data_save_path, img_data)
     np.save(label_data_save_path, label_data)
     return img_data, label_data
+
 
 def run_mnist(X, y, save_path):
     """
@@ -150,7 +152,6 @@ def show_classification_report(X, y, save_path):
     print('x_test shape:', x_test.shape)
     print("y_test:", y_test)
     
-    """
     # Get symbol names
     symbol_names = list(DeepScribe.count_symbols())
     print("symbol names:", symbol_names)
@@ -164,7 +165,6 @@ def show_classification_report(X, y, save_path):
         y_test_list.append(symbol_names[s_idx])
     
     print("y_test_list:", y_test_list)
-    """
     
     try:
         model = keras.models.load_model(save_path) 
@@ -177,6 +177,10 @@ def show_classification_report(X, y, save_path):
         f.close()
         print("File modification finished.")       
     
+    print("x_test:", x_test)
+    # TODO: check an image
+    print("index 900:")
+
     # Print top 5 accuracy
     print("Top 5 accuracy:")
     n = 5
@@ -194,7 +198,6 @@ def show_classification_report(X, y, save_path):
         total +=1
     print(successes/total)
 
-    """
     y_pred = model.predict_classes(x_test)
     print("y_pred:", y_pred)
     y_pred_list = []
@@ -208,20 +211,20 @@ def show_classification_report(X, y, save_path):
     
     # Display 100 images
     # TODO: this does not run
-    images = []
-    titles = []
-    x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2])
+    # images = []
+    # titles = []
+    # x_test = x_test.reshape(x_test.shape[0], x_test.shape[1], x_test.shape[2])
 
-    i = 0
-    while i in range(100):
-        for layer in x_test:
-            images.append(layer)
-            title = "P: " + y_pred_list[i] + ", T: " + y_test_list[i]
-            titles.append(title)
-            i += 1
+    # i = 0
+    # while i in range(100):
+    #     for layer in x_test:
+    #         images.append(layer)
+    #         title = "P: " + y_pred_list[i] + ", T: " + y_test_list[i]
+    #         titles.append(title)
+    #         i += 1
 
-    show_images(images)
-    """
+    # show_images(images)
+
 
 def get_training_curve(output_file):
     """

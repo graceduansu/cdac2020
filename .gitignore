@@ -1,5 +1,7 @@
-a_pfa/
-*.zip
 .vscode
 __pycache__
+*.rar
+a_pfa/
+pfaCutouts/
 output/
+debugging.py

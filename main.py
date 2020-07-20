@@ -4,7 +4,9 @@ import mnist
 import feature_extraction
 from matplotlib import pyplot
 
+
 def run():
+    DeepScribe.count_symbols(sort_by_freq=True)
     # Code to build model:
     # X, y = mnist.dict_to_np_arrays("output/img_data1.npy", "output/label_data1.npy") # run with -l max for all symbols
 
@@ -19,7 +21,7 @@ def run():
     # feature_extraction.extract_features("output/vgg16_fts_color.npy")
 
     # Code to show feature maps - does not work
-    X = np.load("output/vgg16_fts_color.npy")
+    # X = np.load("output/vgg16_fts_color.npy")
     # print(X.shape)
     # for fmap in X:
     #     ix = 1
@@ -32,10 +34,11 @@ def run():
     #             ix += 1
     # pyplot.show()
 
-    y = np.load("output/label_data_gray.npy")
-    feature_extraction.random_forest(X, y)
+    # y = np.load("output/label_data_gray.npy")
+    # feature_extraction.random_forest(X, y)
 
     # feature_extraction.neural_net()
+
 
 if __name__ == '__main__':
     run()

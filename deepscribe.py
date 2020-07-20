@@ -7,10 +7,11 @@ import argparse
 from glob import glob, iglob
 from disp_multiple_images import show_images
 
+excluded_signs = ['b', 'Epigraphic unit', 'g', 'l', 'n', 'p', 'r', 's', 't', 'x', 'y', 'x x', '[x](+)⸢x⸣', '¦', 'š', 'ʾ', 'ḥ']
 
 class DeepScribe:
     """
-    Loads, transforms, and displays OCHRE dataset images.
+    Loads, transforms, and displays OCHRE dataset images from an unzipped archive.
     """
     
     @staticmethod
@@ -30,10 +31,11 @@ class DeepScribe:
                             '--limit',
                             help='limit on number of image results',
                             default=100)
+        parser.add_argument('-d', '--directory', help='image directory')
         args = parser.parse_args()
         return args
 
-    # Maybe change symbol_dict to return value instead of parameter
+    # Maybe change symbol_dict to return value instead of modifying parameter
     @staticmethod
     def load_images(symbol_dict):
         """
@@ -41,7 +43,6 @@ class DeepScribe:
         
         Parameters:
             symbol_dict (dict): Dictionary to store loaded image data as symbol name : Symbol_Image object pairs.
-
         """
         
         args = DeepScribe.get_command_line_args()
@@ -51,27 +52,28 @@ class DeepScribe:
         else:
             symb_query = args.symbol
         
-        query = "a_pfa/" + symb_query + "_*.jpg"
+        query = args.directory + symb_query + "_*.jpg"
         count = 0
 
         for fn in iglob(query):
-            # find second occurence of "_" which marks the start of the uuid
-            separator_idx = fn.find("_", 6)
+            # find first occurence of "_" after directory name, which marks the start of the uuid
+            separator_idx = fn.find("_", args.directory+1)
             extension_idx = fn.rfind(".jpg")
-            name = fn[6:separator_idx]
+            name = fn[args.directory+1 : separator_idx]
             name = name.upper().strip(' »«')
-            uuid = fn[separator_idx+1:extension_idx]
+            uuid = fn[separator_idx+1 : extension_idx]
 
             # not using cv2.imread() in order to read unicode filenames
             img = cv2.imdecode(np.fromfile(fn, dtype=np.uint8),
                                cv2.IMREAD_UNCHANGED)
             symb_img = Symbol_Image(name, uuid, img)
 
-            if name in symbol_dict:
-                symbol_dict[name].append(symb_img)
-            else:
-                symbol_dict[name] = [symb_img]
-            count += 1
+            if name not in excluded_signs:
+                if name in symbol_dict:
+                    symbol_dict[name].append(symb_img)
+                else:
+                    symbol_dict[name] = [symb_img]
+                count += 1
 
             if args.limit != 'max':
                 if count >= args.limit:
@@ -191,7 +193,7 @@ class DeepScribe:
                     symb_img.img = cv2.resize(symb_img.img, (resize, resize))
 
     @staticmethod
-    def count_symbols(printing=False):
+    def count_symbols(printing=False, sort_by_freq=False):
         """
         Count the number of different symbols represented by the images loaded by the command line arguments.
         
@@ -200,6 +202,9 @@ class DeepScribe:
             
         Returns:
             A list of different symbol names that were represented by the images loaded by the command line arguments.
+
+                !!!!!!! sort by count!!!!!!
+
         """
         
         symbol_dict = {}
@@ -210,20 +215,21 @@ class DeepScribe:
         else:
             symb_query = args.symbol
         
-        query = "a_pfa/" + symb_query + "_*.jpg"
+        query = args.directory + symb_query + "_*.jpg"
         count = 0
 
         for fn in iglob(query):
-            # find second occurence of "_" which marks the start of the uuid
-            separator_idx = fn.find("_", 6)
-            name = fn[6:separator_idx]
-            name = name.upper().strip(' »«')
+            # find first occurence of "_" after directory name, which marks the start of the uuid
+            separator_idx = fn.find("_", args.directory+1)
+            name = fn[args.directory+1 : separator_idx]
+            # name = name.upper().strip(' »«')
 
-            if name in symbol_dict:
-                symbol_dict[name] += 1
-            else:
-                symbol_dict[name] = 1
-            count += 1
+            if name not in excluded_signs:
+                if name in symbol_dict:
+                    symbol_dict[name] += 1
+                else:
+                    symbol_dict[name] = 1
+                count += 1
 
             if args.limit != 'max':
                 if count >= args.limit:
@@ -238,6 +244,11 @@ class DeepScribe:
             for s in symbol_dict.values():
                 total += s
             print(total)
+        
+        if sort_by_freq:
+            sorted_dict = {k: v for k, v in sorted(symbol_dict.items(), key=lambda item: item[1])}
+            for s in sorted_dict:
+                print(s, ":", sorted_dict[s])
+            
 
-        # return len(symbol_dict)
         return list(symbol_dict.keys())

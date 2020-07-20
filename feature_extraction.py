@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 
 from deepscribe import DeepScribe
 
+
 def extract_features(save_path):
     """
     symbol_dict = {}
@@ -36,6 +37,7 @@ def extract_features(save_path):
     print(features)
     
     np.save(save_path, features)
+
 
 def neural_net():
     img_data = np.load("output/img_data_color1.npy")
@@ -91,7 +93,8 @@ def random_forest(X, y):
     y_pred = rf.predict(x_test)
 
     # Get symbol names MUST RUN WITH -L MAX
-    symbol_names = list(DeepScribe.count_symbols())
+    symbol_names = list(DeepScribe.count_symbols(printing=True))
+    print(symbol_names)
 
     y_test_list = []
     # Transform y values to corresponding label names
@@ -104,6 +107,13 @@ def random_forest(X, y):
         s_idx = int(y_pred[i])
         y_pred_list.append(symbol_names[s_idx])
 
+    print("y_test_list:", y_test_list)
+    print()
+    print("y_pred_list:", y_pred_list)
+
+    print(classification_report(y_test_list, y_pred_list))
+
+    """
     # Print top 1 accuracy
     print("Top 1 accuracy:")
     print(accuracy_score(y_test, y_pred))
@@ -120,14 +130,12 @@ def random_forest(X, y):
     
     for i in range(len(y_test)):
         top_n_predictions = np.argpartition(probas[i], -n)[-n:]
-        print("top n:", top_n_predictions)
-        print("ytest[i]:", y_test[i])
+        # print("top n:", top_n_predictions)
+        # print("ytest[i]:", y_test[i])
 
         if y_test[i] in top_n_predictions:
-            print("success")
+            # print("success")
             successes += 1
         total +=1
     print(successes/total)
-
-    print(classification_report(y_test_list, y_pred_list))
-
+    """
