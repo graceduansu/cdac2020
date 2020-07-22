@@ -93,7 +93,7 @@ def random_forest(X, y):
     y_pred = rf.predict(x_test)
 
     # Get symbol names MUST RUN WITH -L MAX
-    symbol_names = list(DeepScribe.count_symbols(printing=True))
+    symbol_names = list(DeepScribe.count_symbols(sort_by_alpha=True))
     print(symbol_names)
 
     y_test_list = []

@@ -15,7 +15,7 @@ def run():
     # mnist.run_mnist(X, y, "output/MNIST_model_on_OCHRE_100_epochs")
     # mnist.show_classification_report(X, y, "output/MNIST_model_on_OCHRE_100_epochs")
 
-    # mnist.get_training_curve("training_output_100_epochs.txt")
+    # mnist.get_training_curve("records/training_output_100_epochs.txt")
 
     # Code to test feature extraction:
     # feature_extraction.extract_features("output/vgg16_fts_color.npy")

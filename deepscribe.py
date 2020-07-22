@@ -6,8 +6,11 @@ from symbol_image import Symbol_Image
 import argparse
 from glob import glob, iglob
 from disp_multiple_images import show_images
+import unicodedata
 
-excluded_signs = ['b', 'Epigraphic unit', 'g', 'l', 'n', 'p', 'r', 's', 't', 'x', 'y', 'x x', '[x](+)⸢x⸣', '¦', 'š', 'ʾ', 'ḥ']
+excluded_readings = ['b', 'Epigraphic unit', 'g', 'l', 'n', 'p', 'r', 's', 't', 'x', 'y', 'x x', '[x](+)⸢x⸣', '¦', 'š', 'ʾ', 'ḥ']
+# for i in range(len(excluded_readings)):
+#     excluded_readings[i] = excluded_readings[i].upper()
 
 class DeepScribe:
     """
@@ -50,16 +53,17 @@ class DeepScribe:
         if args.symbol is None:
             symb_query = "*"
         else:
-            symb_query = args.symbol
+            symb_query = unicodedata.normalize('NFC', args.symbol)
         
-        query = args.directory + symb_query + "_*.jpg"
+        query = args.directory + "/" + symb_query + "_*.jpg"
         count = 0
 
         for fn in iglob(query):
             # find first occurence of "_" after directory name, which marks the start of the uuid
-            separator_idx = fn.find("_", args.directory+1)
+            fn = unicodedata.normalize('NFC', fn)
+            separator_idx = fn.find("_", len(args.directory)+1)
             extension_idx = fn.rfind(".jpg")
-            name = fn[args.directory+1 : separator_idx]
+            name = fn[len(args.directory)+1 : separator_idx]
             name = name.upper().strip(' »«')
             uuid = fn[separator_idx+1 : extension_idx]
 
@@ -68,7 +72,7 @@ class DeepScribe:
                                cv2.IMREAD_UNCHANGED)
             symb_img = Symbol_Image(name, uuid, img)
 
-            if name not in excluded_signs:
+            if name not in excluded_readings:
                 if name in symbol_dict:
                     symbol_dict[name].append(symb_img)
                 else:
@@ -193,18 +197,16 @@ class DeepScribe:
                     symb_img.img = cv2.resize(symb_img.img, (resize, resize))
 
     @staticmethod
-    def count_symbols(printing=False, sort_by_freq=False):
+    def count_symbols(sort_by_alpha=False, sort_by_freq=False):
         """
         Count the number of different symbols represented by the images loaded by the command line arguments.
         
         Parameters:
-            printing (boolean): Print out the symbol dictionary of symbol name : frequency pairs for the loaded images.
-            
+            sort_by_alpha (boolean): Print out the symbol dictionary of symbol name : frequency pairs for the loaded images in alphabetical order.
+            sort_by_freq (boolean): Print out the symbol dictionary in ascending order of frequency.
+
         Returns:
             A list of different symbol names that were represented by the images loaded by the command line arguments.
-
-                !!!!!!! sort by count!!!!!!
-
         """
         
         symbol_dict = {}
@@ -213,18 +215,19 @@ class DeepScribe:
         if args.symbol is None:
             symb_query = "*"
         else:
-            symb_query = args.symbol
+            symb_query = unicodedata.normalize('NFC', args.symbol)
         
-        query = args.directory + symb_query + "_*.jpg"
+        query = args.directory + "/" + symb_query + "_*.jpg"
         count = 0
 
         for fn in iglob(query):
             # find first occurence of "_" after directory name, which marks the start of the uuid
-            separator_idx = fn.find("_", args.directory+1)
-            name = fn[args.directory+1 : separator_idx]
-            # name = name.upper().strip(' »«')
+            fn = unicodedata.normalize('NFC', fn)
+            separator_idx = fn.find("_", len(args.directory)+1)
+            name = fn[len(args.directory)+1 : separator_idx]
+            name = name.strip(' »«')
 
-            if name not in excluded_signs:
+            if name not in excluded_readings:
                 if name in symbol_dict:
                     symbol_dict[name] += 1
                 else:
@@ -235,20 +238,26 @@ class DeepScribe:
                 if count >= args.limit:
                     break
         
-        if printing:
-            print(len(symbol_dict))
+        if sort_by_alpha:
             for s in symbol_dict:
                 print(s, ":", symbol_dict[s])
             
             total = 0
             for s in symbol_dict.values():
                 total += s
-            print(total)
+            print("Number of unique signs:", len(symbol_dict))
+            print("Number of images:", total)
         
         if sort_by_freq:
             sorted_dict = {k: v for k, v in sorted(symbol_dict.items(), key=lambda item: item[1])}
             for s in sorted_dict:
                 print(s, ":", sorted_dict[s])
+            
+            total = 0
+            for s in symbol_dict.values():
+                total += s
+            print("Number of unique signs:", len(symbol_dict))
+            print("Number of images:", total)
             
 
         return list(symbol_dict.keys())
