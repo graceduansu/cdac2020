@@ -4,13 +4,14 @@ from matplotlib import pyplot as plt
 
 from symbol_image import Symbol_Image
 import argparse
+import json
 from glob import glob, iglob
 from disp_multiple_images import show_images
 import unicodedata
 
 excluded_readings = ['b', 'Epigraphic unit', 'g', 'l', 'n', 'p', 'r', 's', 't', 'x', 'y', 'x x', '[x](+)⸢x⸣', '¦', 'š', 'ʾ', 'ḥ']
-# for i in range(len(excluded_readings)):
-#     excluded_readings[i] = excluded_readings[i].upper()
+for i in range(len(excluded_readings)):
+    excluded_readings[i] = excluded_readings[i].upper()
 
 class DeepScribe:
     """
@@ -33,7 +34,7 @@ class DeepScribe:
         parser.add_argument('-l',
                             '--limit',
                             help='limit on number of image results',
-                            default=100)
+                            default='max')
         parser.add_argument('-d', '--directory', help='image directory')
         args = parser.parse_args()
         return args
@@ -259,5 +260,4 @@ class DeepScribe:
             print("Number of unique signs:", len(symbol_dict))
             print("Number of images:", total)
             
-
         return list(symbol_dict.keys())
