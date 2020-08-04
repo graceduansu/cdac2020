@@ -8,6 +8,7 @@ import json
 from glob import glob, iglob
 from disp_multiple_images import show_images
 import unicodedata
+from tqdm import tqdm
 
 excluded_readings = ['b', 'Epigraphic unit', 'g', 'l', 'n', 'p', 'r', 's', 't', 'x', 'y', 'x x', '[x](+)⸢x⸣', '¦', 'š', 'ʾ', 'ḥ']
 for i in range(len(excluded_readings)):
@@ -59,7 +60,7 @@ class DeepScribe:
         query = args.directory + "/" + symb_query + "_*.jpg"
         count = 0
 
-        for fn in iglob(query):
+        for fn in tqdm(iglob(query), desc='filenames'):
             # find first occurence of "_" after directory name, which marks the start of the uuid
             fn = unicodedata.normalize('NFC', fn)
             separator_idx = fn.find("_", len(args.directory)+1)
@@ -226,7 +227,7 @@ class DeepScribe:
             fn = unicodedata.normalize('NFC', fn)
             separator_idx = fn.find("_", len(args.directory)+1)
             name = fn[len(args.directory)+1 : separator_idx]
-            name = name.strip(' »«')
+            name = name.strip(' »«').upper()
 
             if name not in excluded_readings:
                 if name in symbol_dict:

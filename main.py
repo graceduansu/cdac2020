@@ -4,11 +4,18 @@ import mnist
 import feature_extraction
 from matplotlib import pyplot
 import neural_network
+import analysis
 
 
 def run():
     # Code to build resnet18:
-    X, y, classes = neural_network.get_x_y_arrays('imgs_gray.npy', 'labels_gray.npy', n='all')
+    # X, y, classes = neural_network.get_x_y_arrays('imgs_gray.npy', 'labels_gray.npy', n='all')
+    # X = np.load("output/imgs_gray.npy")
+    # y = np.load("output/labels_gray.npy")
+    # neural_network.train(X, y, "output/resnet18_073120.h5")
+    analysis.show_classification_report("output/split_data_080120_tf230.npz", "output/resnet18_080120_tf230.h5")
+    # analysis.plot_confusion_matrix("output/split_data_073120.npz", "output/resnet18_073120.h5")
+    # analysis.plot_incorrect_imgs("output/split_data_073120.npz", "output/resnet18_073120.h5")
 
     # Code to build mnist model:
     # X, y = mnist.dict_to_np_arrays("output/img_data1.npy", "output/label_data1.npy") # run with -l max for all symbols
