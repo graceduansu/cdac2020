@@ -13,9 +13,8 @@ def run():
     # X = np.load("output/imgs_gray.npy")
     # y = np.load("output/labels_gray.npy")
     # neural_network.train(X, y, "output/resnet18_073120.h5")
-    analysis.show_classification_report("output/split_data_080120_tf230.npz", "output/resnet18_080120_tf230.h5")
-    # analysis.plot_confusion_matrix("output/split_data_073120.npz", "output/resnet18_073120.h5")
-    # analysis.plot_incorrect_imgs("output/split_data_073120.npz", "output/resnet18_073120.h5")
+    # analysis.show_reports("output/split_data_080120_tf230.npz", "output/label_encoding_073120.npy", "output/resnet18_080120_tf230.h5")
+    analysis.get_training_curves("records/training_output_resnet18_tf220.txt", 22)
 
     # Code to build mnist model:
     # X, y = mnist.dict_to_np_arrays("output/img_data1.npy", "output/label_data1.npy") # run with -l max for all symbols
