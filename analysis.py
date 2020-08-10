@@ -123,13 +123,14 @@ def show_reports(npz_file, encoding_file, model_path):
     filename = "records/incorrect_imgs_" + date.today().strftime("%m%d%y") + ".png"
     plt.savefig(filename)
 
-def get_training_curves(output_file, epochs):
+def get_training_curves(output_file, epochs, n):
     """
     Generates training loss and accuracy curves based on model training output text file.
 
     Parameters:
         output_file (str): File path of model training output text file.
         epochs (int): Number of epochs to plot.
+        n (int): Read first n lines of file only - up to the last line with training loss and accuracy data.
     """
 
     loss = []
@@ -137,7 +138,6 @@ def get_training_curves(output_file, epochs):
     accuracy = []
     val_acc = []
 
-    n = 217
     with open(output_file, "r", encoding='utf-8') as f:
         for i in range(n):
             line = next(f).strip()

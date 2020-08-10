@@ -226,15 +226,22 @@ def train(X, y, model_path):
                 patience=10,
                 restore_best_weights=True,
             )
-        )
+    )
     callbacks.append(
             keras.callbacks.ReduceLROnPlateau(
                 monitor="val_loss", min_delta=1e-4, patience=5
             )
-        )
+    )
 
-    # batch_size was originally 32
-    history = model.fit(x=x_train, y=y_train, batch_size=32, epochs=128,
+    data_gen = keras.preprocessing.image.ImageDataGenerator(
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        fill_mode="constant",
+        cval=0.0
+    )
+
+    history = model.fit(data_gen.flow(x_train, y=y_train, batch_size=32),
+                        epochs=128,
                         steps_per_epoch=int(x_train.shape[0] / 32),
                         validation_data=(x_valid, y_valid),
                         callbacks=callbacks)
@@ -248,20 +255,21 @@ def train(X, y, model_path):
     # summarize history for accuracy
     plt.plot(history.history['accuracy'])
     plt.plot(history.history['val_accuracy'])
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
+    plt.title('Model Training Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'valid'], loc='upper left')
     filename = "records/model_accuracy_" + date.today().strftime("%m%d%y") + ".png"
     plt.savefig(filename)
-    
+    plt.close()
+
     # summarize history for loss
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper right')
+    plt.title('Model Training Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['train', 'valid'], loc='upper right')
     filename = "records/model_loss_" + date.today().strftime("%m%d%y") + ".png"
     plt.savefig(filename)
     
