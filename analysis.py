@@ -78,19 +78,25 @@ def show_reports(npz_file, encoding_file, model_path):
 
     ####### plot_confusion_matrix #################################
     confusion = confusion_matrix(y_test_list, y_pred_list)
-    
     fig = plt.figure(figsize=(34, 34))
-    ax = fig.add_subplot(111)
+    rect = 0.1, 0.1, 0.8, 0.8
+    ax = fig.add_axes(rect)
     plt.title("Confusion matrix")
     cax = ax.matshow(confusion)
     fig.colorbar(cax)
 
-    ax.set_xticks(range(len(symbol_names)))
-    ax.set_yticks(range(len(symbol_names)))
+    # Use confusion matrix label order as label mapping
+    class_keys = classification_report(y_test_list, y_pred_list, output_dict=True)
+    class_keys.pop('accuracy', None)
+    class_keys.pop('macro avg', None)
+    class_keys.pop('weighted avg', None)
+    class_keys = list(class_keys.keys())
+
+    ax.set_xticks(range(len(class_keys)))
+    ax.set_yticks(range(len(class_keys)))
     # appending extra tick label to make sure everything aligns properly
-    ax.set_xticklabels(symbol_names, rotation=45)
-    ax.set_yticklabels(symbol_names)
-    plt.tight_layout()
+    ax.set_xticklabels(class_keys, rotation=90)
+    ax.set_yticklabels(class_keys)
     filename = "records/confusion_matrix_" + date.today().strftime("%m%d%y") + ".png"
     plt.savefig(filename)
     

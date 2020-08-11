@@ -13,7 +13,7 @@ def run():
     # X = np.load("output/imgs_gray.npy")
     # y = np.load("output/labels_gray.npy")
     # neural_network.train(X, y, "output/resnet18_073120.h5")
-    analysis.show_reports("output/split_data_resnet18_080520_tf2_lastDropOut075.npz", "output/label_encoding_073120.npy", "output/resnet18_080520_tf2_lastDropOut075.h5")
+    analysis.show_reports("output/split_data_resnet18_080120_tf2.npz", "output/label_encoding_073120.npy", "output/resnet18_080120_tf2.h5")
     # analysis.get_training_curves("records/training_output_resnet18_080520_tf2_lastDropOut075.txt", 20, 213)
 
     # Code to build mnist model:
