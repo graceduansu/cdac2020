@@ -77,7 +77,7 @@ def show_reports(npz_file, encoding_file, model_path):
     print(classification_report(y_test_list, y_pred_list))
 
     ####### plot_confusion_matrix #################################
-    confusion = confusion_matrix(y_test_list, y_pred_list)
+    confusion = confusion_matrix(y_test_list, y_pred_list)    
     fig = plt.figure(figsize=(34, 34))
     rect = 0.1, 0.1, 0.8, 0.8
     ax = fig.add_axes(rect)
@@ -85,13 +85,20 @@ def show_reports(npz_file, encoding_file, model_path):
     cax = ax.matshow(confusion)
     fig.colorbar(cax)
 
-    # Use confusion matrix label order as label mapping
+    # Use classification report's label order as label mapping
     class_keys = classification_report(y_test_list, y_pred_list, output_dict=True)
     class_keys.pop('accuracy', None)
     class_keys.pop('macro avg', None)
     class_keys.pop('weighted avg', None)
     class_keys = list(class_keys.keys())
-
+    qa = np.array_repr(confusion[class_keys.index('QA')]).replace('\n', '').replace('    ', '')
+    ud = np.array_repr(confusion[class_keys.index('UD')]).replace('\n', '').replace('    ', '')
+    zid = np.array_repr(confusion[class_keys.index('ZÍD')]).replace('\n', '').replace('    ', '')
+    print(" QA:", qa)
+    print(" UD:", ud)
+    print("ZÍD", zid)
+    print("key:", class_keys)
+    """
     ax.set_xticks(range(len(class_keys)))
     ax.set_yticks(range(len(class_keys)))
     # appending extra tick label to make sure everything aligns properly
@@ -128,6 +135,7 @@ def show_reports(npz_file, encoding_file, model_path):
 
     filename = "records/incorrect_imgs_" + date.today().strftime("%m%d%y") + ".png"
     plt.savefig(filename)
+    """
 
 def get_training_curves(output_file, epochs, n):
     """
@@ -145,7 +153,7 @@ def get_training_curves(output_file, epochs, n):
     val_acc = []
 
     with open(output_file, "r", encoding='utf-8') as f:
-        for i in range(n):
+        for _ in range(n):
             line = next(f).strip()
 
             l = line.find("loss: ")

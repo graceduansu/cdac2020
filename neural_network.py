@@ -162,7 +162,6 @@ def build_resnet18(input_shape, num_classes):
         x, 3, [128, 128, 512], stage=3, block="c")
 
     x = keras.layers.GlobalAveragePooling2D()(x)
-    x = keras.layers.Dropout(0.5)(x)
 
     for _ in range(3): #param: n_dense layers
         x = keras.layers.Dense(512, activation="relu")(x)
